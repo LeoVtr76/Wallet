@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-contract Wall {
+contract Wallet {
     address owner;
     uint totalBalance;
     constructor() {
