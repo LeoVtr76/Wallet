@@ -35,11 +35,11 @@ html, body {
 }
 .flou {
   position: absolute;
-  top: -50%; /* Centrage vertical */
-  left: -50%; /* Centrage horizontal */
-  width: 200%; /* 2 fois la taille du cercle */
-  height: 200%; /* 2 fois la taille du cercle */
-  z-index: 1; /* Assurez-vous que cette image est derrière le cercle */
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 1;
 }
 .circle, .ether {
   position: absolute;
@@ -49,12 +49,34 @@ html, body {
   height: 100%;
   z-index : 2;
 }
-
 .ether {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 70%;
   height: auto; 
+}
+.btn-send, .btn-receive {
+  position: absolute;
+  bottom: 10px;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-send:hover, .btn-receive:hover {
+  background-color: #555; 
+}
+
+.btn-send {
+  left: 10px;
+}
+
+.btn-receive {
+  right: 10px;
 }
 

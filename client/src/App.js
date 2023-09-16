@@ -11,6 +11,8 @@ function App() {
         <img className="circle noselect" src={circleImg} alt="circle" />
         <img className="ether noselect" src={etherImg} alt="ether" />
       </div>
+      <button className="btn-send">DEPOSER DE L'ETHER</button>
+      <button className="btn-receive">RECUPERER DE L'ETHER</button>
     </div>
   );
 }
