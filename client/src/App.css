@@ -1,8 +1,9 @@
 .App {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh; /* Utilisez 100% de la hauteur de la fenêtre */
+  align-items: flex-start;
+  height: 100vh;
+  padding-top: 30vh;
 }
 
 .logo {
@@ -20,11 +21,10 @@
 }
 
 .ether {
-  /* Ajustez ces valeurs pour centrer l'image ether à l'intérieur de l'image circle */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60%; /* Ajustez la taille de l'image ether par rapport à l'image circle */
-  height: auto; /* Conservez les proportions de l'image */
+  width: 70%;
+  height: auto; 
 }
 
