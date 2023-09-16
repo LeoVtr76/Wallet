@@ -6,7 +6,10 @@
   -ms-user-select: none;       /* Internet Explorer/Edge */
   user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
 }
-
+@font-face {
+  font-family: 'Ablation';
+  src: url('./font/Ablation.otf') format('opentype');
+}
 * {
   margin: 0;
   padding: 0;
@@ -58,7 +61,7 @@ html, body {
 }
 .btn-send, .btn-receive {
   position: absolute;
-  bottom: 10px;
+  bottom: 50px;
   padding: 10px 20px;
   background-color: #333;
   color: #fff;
@@ -66,17 +69,18 @@ html, body {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-}
+  font-family: Ablation, sans-serif;
+} 
 
 .btn-send:hover, .btn-receive:hover {
   background-color: #555; 
 }
 
 .btn-send {
-  left: 10px;
+  left: 50px;
 }
 
 .btn-receive {
-  right: 10px;
+  right: 50px;
 }
 
