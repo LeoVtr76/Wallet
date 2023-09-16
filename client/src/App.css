@@ -1,9 +1,31 @@
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Safari */
+  -khtml-user-select: none;    /* Konqueror HTML */
+  -moz-user-select: none;      /* Old versions of Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%; /* Assurez-vous que le corps et le html prennent toute la hauteur */
+  overflow: hidden; /* Empêche le défilement */
+}
 .App {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   height: 100vh;
   padding-top: 30vh;
+  background-image: url('./img/background.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .logo {
