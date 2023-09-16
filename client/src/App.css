@@ -7,8 +7,8 @@
   user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
 }
 @font-face {
-  font-family: 'Ablation';
-  src: url('./font/Ablation.otf') format('opentype');
+  font-family: 'AblationBlack';
+  src: url('./font/AblationBlack.otf') format('opentype');
 }
 * {
   margin: 0;
@@ -20,6 +20,7 @@ html, body {
   overflow: hidden; /* Empêche le défilement */
 }
 .App {
+  position : relative;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -30,7 +31,20 @@ html, body {
   background-repeat: no-repeat;
   background-position: center;
 }
-
+.wallet {
+  position: absolute;
+  top: 20px;
+  left: 20px; 
+  font-family: 'AblationBlack', sans-serif;
+  color: white;
+}
+.greeting {
+  position: absolute;
+  top: 20px;
+  right: 20px; 
+  font-family: 'AblationBlack', sans-serif;
+  color: white;
+}
 .logo {
   position: relative;
   width: 150px;
@@ -63,13 +77,12 @@ html, body {
   position: absolute;
   bottom: 50px;
   padding: 10px 20px;
-  background-color: #333;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  font-family: Ablation, sans-serif;
+  font-family: AblationBlack, sans-serif;
 } 
 
 .btn-send:hover, .btn-receive:hover {
@@ -78,9 +91,11 @@ html, body {
 
 .btn-send {
   left: 50px;
+  background-color: #00C8E3;
 }
 
 .btn-receive {
   right: 50px;
+  background-color: #FF1980;
 }
 

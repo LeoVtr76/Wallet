@@ -6,6 +6,8 @@ import flouImg from './img/flou.png'
 function App() {
   return (
     <div className="App">
+            <div className="wallet">ETHEREUM WALLET</div>
+      <div className="greeting">BONJOUR LEO</div>
       <div className="logo">
       <img className="flou noselect" src={flouImg} alt="flou" />
         <img className="circle noselect" src={circleImg} alt="circle" />
