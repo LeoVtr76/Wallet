@@ -69,7 +69,7 @@ function App() {
   const sendEth = async () => {
     if (state.contract) {
       try {
-        const transaction = await state.contract.sendEth(10**17);
+        const transaction = await state.contract.sendEth(10);
         await transaction.wait();
         fetchBalance(state.contract);
       } catch (err) {
@@ -83,7 +83,6 @@ function App() {
       <img className="leftLine" src={leftLineImg} alt="line" />
       <div className="greeting noselect">BONJOUR LEO</div>
       <img className="rightLine" src={rightLineImg} alt="line" />
-      {error && <p>{error}</p>}
       <div className="logoContainer">
         <div className="logo">
           <img className="flou noselect" src={flouImg} alt="flou" />
@@ -91,6 +90,7 @@ function App() {
           <img className="ether noselect" src={etherImg} alt="ether" />
         </div>
         <div className="ethAmount">{balance || 0} ETH</div>
+        {error && <p>{error}</p>}
       </div>
       <button onClick={sendEth} className="btn-send">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive">RECUPERER DE L'ETHER</button>
