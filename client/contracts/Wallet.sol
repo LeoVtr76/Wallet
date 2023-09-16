@@ -8,7 +8,7 @@ contract Wallet {
         owner = msg.sender;
     }
     modifier onlyOwner() {
-        require (msg.sender == owner);
+        require (msg.sender == owner, "not the owner");
         _;
     }
     struct account {
@@ -17,23 +17,25 @@ contract Wallet {
 
     mapping (address => account) accounts;
 
-    function send() external payable {
+    function sendEth() external payable {
         accounts[msg.sender].balance += msg.value;
         totalBalance += msg.value;
     }
     function getBalance() external view returns(uint) {
         return accounts[msg.sender].balance;
     }
-    function withdrawAll() external {
-        uint _balance = accounts[msg.sender].balance;
-        require(_balance != 0);
-        require(_balance <= address(this).balance);
-        payable(msg.sender).transfer(_balance);
+    function withdrawAll(address payable _to) external {
+        uint _balance = accounts[_to].balance;
+        require(_balance != 0, "Votre balance est nulle !");
+        require(_balance <= address(this).balance, "votre solde est superieur a la quantite d'ether disponible");
+        _to.transfer(_balance);
         totalBalance -= _balance;
+        accounts[_to].balance = 0;
     }
     function withdrawAllAdmin() external onlyOwner {
-        payable(msg.sender).transfer(address(this).balance);
-        totalBalance -= address(this).balance;
+        uint _balance = address(this).balance;
+        totalBalance -= _balance;
+        payable(msg.sender).transfer(_balance);
     }
     receive() external payable {}
     fallback() external payable {}
