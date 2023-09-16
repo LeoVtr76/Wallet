@@ -36,14 +36,26 @@ html, body {
   top: 20px;
   left: 20px; 
   font-family: 'AblationBlack', sans-serif;
+  font-size: 22px;
   color: white;
 }
+.leftLine {
+  position: absolute;
+  top: 40px; 
+  left: 15px;
+}
 .greeting {
+  font-size: 22px;
   position: absolute;
   top: 20px;
   right: 20px; 
   font-family: 'AblationBlack', sans-serif;
   color: white;
+}
+.rightLine {
+  position: absolute;
+  top: 40px; 
+  right: 18px;
 }
 .logoContainer {
   display: flex;
