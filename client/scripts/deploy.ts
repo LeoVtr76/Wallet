@@ -4,7 +4,7 @@ async function main() {
   const Wallet = await ethers.deployContract("Wallet", [], {})
   await Wallet.waitForDeployment();
 
-  console.log(`Contract deployed at address : ${Wallet.target}`);
+  console.log(`MintNFT deployed to ${Wallet.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -13,3 +13,4 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
