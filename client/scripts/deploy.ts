@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const Wallet = await ethers.deployContract("Wallet", [], {});
+  const Wallet = await ethers.deployContract("Wallet", [], {})
   await Wallet.waitForDeployment();
 
   console.log(`Contract deployed at address : ${Wallet.target}`);
