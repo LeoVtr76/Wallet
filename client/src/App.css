@@ -45,6 +45,11 @@ html, body {
   font-family: 'AblationBlack', sans-serif;
   color: white;
 }
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .logo {
   position: relative;
   width: 150px;
@@ -73,6 +78,13 @@ html, body {
   width: 70%;
   height: auto; 
 }
+.ethAmount {
+  font-family: 'AblationBlack', sans-serif;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20px;
+  color: #ffffff;
+}
 .btn-send, .btn-receive {
   position: absolute;
   bottom: 50px;
@@ -84,11 +96,13 @@ html, body {
   transition: background-color 0.3s;
   font-family: AblationBlack, sans-serif;
 } 
-
-.btn-send:hover, .btn-receive:hover {
-  background-color: #555; 
+.btn-send:hover{
+  background-color: #015661; 
 }
-
+.btn-receive:hover {
+  background-color:  #5f0d32;; 
+  
+}
 .btn-send {
   left: 50px;
   background-color: #00C8E3;
