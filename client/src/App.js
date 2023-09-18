@@ -1,6 +1,7 @@
 import './App.css';
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import { parseUnits, formatEther } from "ethers";
 import Wallet from "./artifacts/contracts/Wallet.sol/Wallet.json";
 import circleImg from './img/circle.png';
 import etherImg from './img/ether.png';
@@ -12,53 +13,101 @@ function App() {
   const [state, setState] = useState({contract : null,});
   const [balance, setBalance] = useState();
   const [error, setError] = useState('');
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [finalUserName, setFinalUserName] = useState('');
 
-  useEffect(() => {
-    console.log("useEffect");
+useEffect(() => {
     const connectWallet = async () => {
-      try {
-        const { ethereum } = window;
-        if (ethereum) {
-          console.log("ethereum");
-          await ethereum.request({
-            method: "eth_requestAccounts",
-          });
-          const provider = new ethers.BrowserProvider(window.ethereum);
-          const signer = await provider.getSigner();
-          const contract = new ethers.Contract(
-            WalletAddress,
-            Wallet.abi,
-            signer
-          );
-          console.log("contract :" ,contract);
-          setState({ contract });
-          console.log(contract);
-          fetchBalance(contract);
+        try {
+            const { ethereum } = window;
+            if (ethereum) {
+                await ethereum.request({
+                    method: "eth_requestAccounts",
+                });
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const contract = new ethers.Contract(
+                    WalletAddress,
+                    Wallet.abi,
+                    signer
+                );
+                setState({ contract });
+                fetchBalance(contract);
+                checkName(contract);
+            }
+        } catch (error) {
+            console.log(error);
         }
-      } catch (error) {
-        console.log(error);
-      }
     };
+
+    const handleAccountsChanged = async (accounts) => {
+        if (accounts.length === 0) {
+            console.log('L\'utilisateur a déconnecté MetaMask');
+        } else {
+            console.log('Compte sélectionné par l\'utilisateur:', accounts[0]);
+            if (state.contract) {
+                fetchBalance(state.contract);
+                checkName(state.contract);
+            }
+        }
+    };
+
+    if (window.ethereum) {
+        window.ethereum.on('accountsChanged', handleAccountsChanged);
+    }
+
     connectWallet();
-  }, []);
 
-
+    return () => {
+        // Supprimez l'écouteur d'événements lorsque le composant est démonté
+        if (window.ethereum) {
+            window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        }
+    };
+}, [state.contract]);
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    if (value.length > 10) {
+        setError("Le nom ne peut pas dépasser 10 caractères !");
+    } else {
+        setUserName(value);
+        setError(''); // Réinitialisez le message d'erreur
+    }
+  }
+  const checkName = async (contract) => {
+    const name = await contract.getName();
+    setFinalUserName(name);
+    if (name === "") {
+        setShowNameInput(true);
+    } 
+    else {
+      setShowNameInput(false);
+    }
+  }
   const fetchBalance = async (contract) => {
     try {
       const _balance = await contract.getBalance();
-      setBalance(_balance);
+      setBalance(formatEther(_balance));
     } catch (err) {
       setError(err.message);
     }
   }
-
-  const withdrawAll = async (contract) => {
-    console.log("withdraw clicked");
+  const setName = async () => {
+    try {
+        const transaction = await state.contract.setName(userName);
+        await transaction.wait();
+        setShowNameInput(false); // Cachez le champ d'entrée une fois que le nom est défini
+        setFinalUserName(userName);
+    } catch (err) {
+        setError(err.message);
+    }
+  }
+  const withdrawAll = async () => {
     if (state.contract) {
-      console.log("withdraw state.contract");
       try{
         const transaction = await state.contract.withdrawAll();
-        transaction.wait();
+        await transaction.wait();
         fetchBalance(state.contract);
       }
       catch (err) {
@@ -69,7 +118,10 @@ function App() {
   const sendEth = async () => {
     if (state.contract) {
       try {
-        const transaction = await state.contract.sendEth(10);
+        let overrides = {
+          value: parseUnits("0.1", "ether"),
+      };
+        const transaction = await state.contract.sendEth(overrides);
         await transaction.wait();
         fetchBalance(state.contract);
       } catch (err) {
@@ -80,20 +132,28 @@ function App() {
   return (
     <div className="App">
       <div className="wallet noselect">ETHEREUM WALLET</div>
-      <img className="leftLine" src={leftLineImg} alt="line" />
-      <div className="greeting noselect">BONJOUR LEO</div>
-      <img className="rightLine" src={rightLineImg} alt="line" />
+      <img className="leftLine noselect" draggable="false" src={leftLineImg} alt="line" />
+      <div className="greeting noselect">BONJOUR {finalUserName || "INCONNU"}</div>
+      <img className="rightLine noselect" draggable="false" src={rightLineImg} alt="line" />
+      {error && <p>{error}</p>}
       <div className="logoContainer">
         <div className="logo">
-          <img className="flou noselect" src={flouImg} alt="flou" />
-          <img className="circle noselect" src={circleImg} alt="circle" />
-          <img className="ether noselect" src={etherImg} alt="ether" />
+          <img className="flou noselect" draggable="false" src={flouImg} alt="flou" />
+          <img className="circle noselect" draggable="false" src={circleImg} alt="circle" />
+          <img className="ether noselect" draggable="false" src={etherImg} alt="ether" />
         </div>
         <div className="ethAmount">{balance || 0} ETH</div>
-        {error && <p>{error}</p>}
+        {
+          showNameInput && (
+            <div className="setName">
+              <input type="text" value={userName} onChange={handleNameChange} placeholder="Enter your name" maxLength={10}/>
+              <button onClick={setName}>SETNAME</button>
+            </div>
+          )
+        }
       </div>
-      <button onClick={sendEth} className="btn-send">DEPOSER DE L'ETHER</button>
-      <button onClick={withdrawAll}className="btn-receive">RECUPERER DE L'ETHER</button>
+      <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
+      <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
     </div>
   );
 }
