@@ -97,6 +97,28 @@ html, body {
   margin-top: 20px;
   color: #ffffff;
 }
+.setName {
+  text-align: center;
+  margin-top: 20px;
+}
+.setName input {
+  font-family: 'AblationBlack', sans-serif;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+}
+.setName button {
+  background-color: #61dafb;
+  font-family: 'AblationBlack', sans-serif;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 .btn-send, .btn-receive {
   position: absolute;
   bottom: 50px;
