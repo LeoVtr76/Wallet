@@ -16,31 +16,31 @@ function App() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [userName, setUserName] = useState('');
   const [finalUserName, setFinalUserName] = useState('');
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
-useEffect(() => {
+  useEffect(() => {
     const connectWallet = async () => {
-        try {
-            const { ethereum } = window;
-            if (ethereum) {
-                await ethereum.request({
-                    method: "eth_requestAccounts",
-                });
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await provider.getSigner();
-                const contract = new ethers.Contract(
-                    WalletAddress,
-                    Wallet.abi,
-                    signer
-                );
-                setState({ contract });
-                fetchBalance(contract);
-                checkName(contract);
-            }
+      try {
+          const { ethereum } = window;
+          if (ethereum) {
+              await ethereum.request({
+                  method: "eth_requestAccounts",
+              });
+              const provider = new ethers.BrowserProvider(window.ethereum);
+              const signer = await provider.getSigner();
+              const contract = new ethers.Contract(
+                  WalletAddress,
+                  Wallet.abi,
+                  signer
+              );
+              setState({ contract });
+              fetchBalance(contract);
+              checkName(contract);
+          }
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
     };
-
     const handleAccountsChanged = async (accounts) => {
         if (accounts.length === 0) {
             console.log('L\'utilisateur a déconnecté MetaMask');
@@ -52,34 +52,36 @@ useEffect(() => {
             }
         }
     };
-
     if (window.ethereum) {
         window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
-
     connectWallet();
-
-    return () => {
-        // Supprimez l'écouteur d'événements lorsque le composant est démonté
-        if (window.ethereum) {
-            window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        }
-    };
 }, [state.contract]);
+useEffect(() => {
+  if (error) {
+      setShowErrorPopup(true);
+      // Cachez la pop-up après 3 secondes
+      const timer = setTimeout(() => {
+          setShowErrorPopup(false);
+          setError(''); // Réinitialisez également l'erreur
+      }, 3000);
+      return () => clearTimeout(timer);
+  }
+}, [error]);
   const handleNameChange = (e) => {
     const value = e.target.value;
     if (value.length > 10) {
         setError("Le nom ne peut pas dépasser 10 caractères !");
     } else {
         setUserName(value);
-        setError(''); // Réinitialisez le message d'erreur
+        setError(''); 
     }
   }
   const checkName = async (contract) => {
     const name = await contract.getName();
     setFinalUserName(name);
     if (name === "") {
-        setShowNameInput(true);
+      setShowNameInput(true);
     } 
     else {
       setShowNameInput(false);
@@ -90,7 +92,8 @@ useEffect(() => {
       const _balance = await contract.getBalance();
       setBalance(formatEther(_balance));
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.info.error.data.data.reason;
+      setError(errorMessage);
     }
   }
   const setName = async () => {
@@ -100,7 +103,8 @@ useEffect(() => {
         setShowNameInput(false); // Cachez le champ d'entrée une fois que le nom est défini
         setFinalUserName(userName);
     } catch (err) {
-        setError(err.message);
+      const errorMessage = err.info.error.data.data.reason;
+      setError(errorMessage);
     }
   }
   const withdrawAll = async () => {
@@ -111,7 +115,8 @@ useEffect(() => {
         fetchBalance(state.contract);
       }
       catch (err) {
-        setError(err.message);
+        const errorMessage = err.info.error.data.data.reason;
+        setError(errorMessage);
       }
     }
   }
@@ -125,7 +130,8 @@ useEffect(() => {
         await transaction.wait();
         fetchBalance(state.contract);
       } catch (err) {
-        setError(err.message);
+        const errorMessage = err.info.error.data.data.reason;
+        setError(errorMessage);
       }
     }
   }
@@ -135,7 +141,6 @@ useEffect(() => {
       <img className="leftLine noselect" draggable="false" src={leftLineImg} alt="line" />
       <div className="greeting noselect">BONJOUR {finalUserName || "INCONNU"}</div>
       <img className="rightLine noselect" draggable="false" src={rightLineImg} alt="line" />
-      {error && <p>{error}</p>}
       <div className="logoContainer">
         <div className="logo">
           <img className="flou noselect" draggable="false" src={flouImg} alt="flou" />
@@ -154,8 +159,10 @@ useEffect(() => {
       </div>
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
+      <div className={`error-popup ${showErrorPopup ? 'show-error' : ''}`}>
+            {error}
+      </div>
     </div>
   );
 }
-
 export default App;
