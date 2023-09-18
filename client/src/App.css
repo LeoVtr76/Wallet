@@ -31,6 +31,24 @@ html, body {
   background-repeat: no-repeat;
   background-position: center;
 }
+.error-popup {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #FF4D4D;
+  font-family: 'AblationBlack', sans-serif;
+  color: #fff;
+  border-radius: 5px;
+  z-index: 1000;
+  transition: transform 0.3s, opacity 0.3s;
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.show-error {
+  transform: translateY(0);
+  opacity: 1;
+}
 .wallet {
   position: absolute;
   top: 20px;
@@ -141,7 +159,6 @@ html, body {
   left: 50px;
   background-color: #00C8E3;
 }
-
 .btn-receive {
   right: 50px;
   background-color: #FF1980;
