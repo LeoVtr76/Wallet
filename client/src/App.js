@@ -10,6 +10,7 @@ import leftLineImg from './assets/img/leftLine.png'
 import rightLineImg from './assets/img/rightLine.png'
 //Components 
 import ErrorPopup from './components/ErrorPopup';
+import SetName from './components/SetName';
 
 const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 function App() {
@@ -68,15 +69,7 @@ function App() {
       }
     };
   }, [state.contract]);
-  const handleNameChange = (e) => {
-    const value = e.target.value;
-    const maxvalue = 16;
-    if (value.length >= maxvalue) {
-      setCurrentError({localCode : "ERR002", localMessage :`Le nom ne peut pas dépasser ${maxvalue} caractères !`});
-    } else {
-      setUserName(value);
-    }
-  }
+
   const checkName = async (contract) => {
     const name = await contract.getName();
     setFinalUserName(name);
@@ -85,6 +78,7 @@ function App() {
     } 
     else {
       setShowNameInput(false);
+      setUserName(name);
     }
   }
   const fetchBalance = async (contract) => {
@@ -96,17 +90,7 @@ function App() {
       console.log("error from checkName");
     }
   }
-  const setName = async () => {
-    try {
-        const transaction = await state.contract.setName(userName);
-        await transaction.wait();
-        setShowNameInput(false); // Cachez le champ d'entrée une fois que le nom est défini
-        setFinalUserName(userName);
-    } catch (err) {
-      setCurrentError(err);
-      console.log(`error from setName`);
-    }
-  }
+
   const withdrawAll = async () => {
     if (state.contract) {
       try{
@@ -148,14 +132,7 @@ function App() {
           <img className="ether noselect" draggable="false" src={etherImg} alt="ether" />
         </div>
         <div className="ethAmount">{balance === "0.0" ? "0" : balance || 0} ETH</div>
-        {
-          showNameInput && (
-            <div className="setName">
-              <input type="text" value={userName} onChange={handleNameChange} placeholder="Entrez un nom d'utilisateur" maxLength={16}/>
-              <button onClick={setName}>Valider</button>
-            </div>
-          )
-        }
+        <SetName contract={state.contract} onError={setCurrentError} onFinalUsername={setUserName} />
       </div>
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
