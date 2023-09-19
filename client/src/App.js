@@ -12,11 +12,11 @@ const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 function App() {
   const [state, setState] = useState({contract : null,});
   const [balance, setBalance] = useState();
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState([]);
   const [showNameInput, setShowNameInput] = useState(false);
   const [userName, setUserName] = useState('');
   const [finalUserName, setFinalUserName] = useState('');
-  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [popupAnimation, setPopupAnimation] = useState('');
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -57,24 +57,45 @@ function App() {
     }
     connectWallet();
 }, [state.contract]);
+
+// UseEffect for Error
 useEffect(() => {
-  if (error) {
-      setShowErrorPopup(true);
-      // Cachez la pop-up après 3 secondes
-      const timer = setTimeout(() => {
-          setShowErrorPopup(false);
-          setError(''); // Réinitialisez également l'erreur
-      }, 3000);
-      return () => clearTimeout(timer);
+    const errorContainer = document.querySelector('.error-container');
+    if (errorContainer) {
+        console.log("Position du error-container:", errorContainer.getBoundingClientRect());
+    }
+}, [errors]);
+const ErrorHandler = (err) => {
+  let errorMessage;
+  if (err.info && err.info.error && err.info.error.code) {
+      var code = err.info.error.code;
+      if (code === 4001) {
+          errorMessage = "La transaction a été annulée";
+      } else if (code === -32603 && err.info.error.data && err.info.error.data.data && err.info.error.data.data.reason) {
+          errorMessage = err.info.error.data.data.reason;
+      } else {
+          errorMessage = "Une erreur inconnue est survenue";
+      }
+      setErrors(prevErrors => [errorMessage, ...prevErrors]);
+      setPopupAnimation('slideIn');
   }
-}, [error]);
+}
+const closeErrorPopup = (index) => {
+  setPopupAnimation('slideOut');
+  setTimeout(() => {
+      setErrors(prevErrors => {
+          return prevErrors.filter((_, i) => i !== index);
+      });
+  }, 300); // Attendre que l'animation soit terminée pour supprimer l'erreur
+}
   const handleNameChange = (e) => {
     const value = e.target.value;
-    if (value.length > 10) {
-        setError("Le nom ne peut pas dépasser 10 caractères !");
+    const maxvalue = 15;
+    if (value.length > maxvalue) {
+        setErrors(`Le nom ne peut pas dépasser ${maxvalue} caractères !`);
     } else {
         setUserName(value);
-        setError(''); 
+        closeErrorPopup();
     }
   }
   const checkName = async (contract) => {
@@ -92,8 +113,7 @@ useEffect(() => {
       const _balance = await contract.getBalance();
       setBalance(formatEther(_balance));
     } catch (err) {
-      const errorMessage = err.info.error.data.data.reason;
-      setError(errorMessage);
+      ErrorHandler(err);
     }
   }
   const setName = async () => {
@@ -103,8 +123,7 @@ useEffect(() => {
         setShowNameInput(false); // Cachez le champ d'entrée une fois que le nom est défini
         setFinalUserName(userName);
     } catch (err) {
-      const errorMessage = err.info.error.data.data.reason;
-      setError(errorMessage);
+      ErrorHandler(err);
     }
   }
   const withdrawAll = async () => {
@@ -115,8 +134,7 @@ useEffect(() => {
         fetchBalance(state.contract);
       }
       catch (err) {
-        const errorMessage = err.info.error.data.data.reason;
-        setError(errorMessage);
+        ErrorHandler(err);
       }
     }
   }
@@ -130,8 +148,7 @@ useEffect(() => {
         await transaction.wait();
         fetchBalance(state.contract);
       } catch (err) {
-        const errorMessage = err.info.error.data.data.reason;
-        setError(errorMessage);
+        ErrorHandler(err);
       }
     }
   }
@@ -147,20 +164,25 @@ useEffect(() => {
           <img className="circle noselect" draggable="false" src={circleImg} alt="circle" />
           <img className="ether noselect" draggable="false" src={etherImg} alt="ether" />
         </div>
-        <div className="ethAmount">{balance || 0} ETH</div>
+        <div className="ethAmount">{balance === "0.0" ? "0" : balance || 0} ETH</div>
         {
           showNameInput && (
             <div className="setName">
-              <input type="text" value={userName} onChange={handleNameChange} placeholder="Enter your name" maxLength={10}/>
-              <button onClick={setName}>SETNAME</button>
+              <input type="text" value={userName} onChange={handleNameChange} placeholder="Entrez un nom d'utilisateur" maxLength={16}/>
+              <button onClick={setName}>Valider</button>
             </div>
           )
         }
       </div>
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
-      <div className={`error-popup ${showErrorPopup ? 'show-error' : ''}`}>
-            {error}
+      <div className="error-container">
+        {errors.map((error, index) => (
+          <div key={index} className={`error-popup ${popupAnimation}`}>
+            <span>{error}</span>
+            <button onClick={() => closeErrorPopup(index)}>X</button>
+          </div>
+          ))}
       </div>
     </div>
   );

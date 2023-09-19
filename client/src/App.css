@@ -31,23 +31,60 @@ html, body {
   background-repeat: no-repeat;
   background-position: center;
 }
-.error-popup {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background-color: #FF4D4D;
-  font-family: 'AblationBlack', sans-serif;
-  color: #fff;
-  border-radius: 5px;
+.error-container {
+  position: fixed;
+  top: 70px;
+  right: 10px;
   z-index: 1000;
-  transition: transform 0.3s, opacity 0.3s;
-  transform: translateY(-100%);
-  opacity: 0;
 }
-.show-error {
-  transform: translateY(0);
-  opacity: 1;
+
+.error-popup {
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 250px;
+}
+
+.error-popup button {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@keyframes slideIn {
+  from {
+      transform: translateX(100%);
+  }
+  to {
+      transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+      transform: translateX(0);
+  }
+  to {
+      transform: translateX(100%);
+  }
+}
+.slideIn {
+  animation-name: slideIn;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
+}
+
+.slideOut {
+  animation-name: slideOut;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
 }
 .wallet {
   position: absolute;
@@ -126,6 +163,7 @@ html, body {
   font-size: 16px;
   border: none;
   border-radius: 5px;
+  width: 310px;
 }
 .setName button {
   background-color: #61dafb;
