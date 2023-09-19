@@ -21,27 +21,30 @@ function App() {
   const [currentError, setCurrentError] = useState({});
 
   useEffect(() => {
+    let isMounted = true; 
     const connectWallet = async () => {
       try {
           const { ethereum } = window;
-          if (ethereum) {
-              await ethereum.request({
-                  method: "eth_requestAccounts",
-              });
-              const provider = new ethers.BrowserProvider(window.ethereum);
-              const signer = await provider.getSigner();
-              const contract = new ethers.Contract(
-                  WalletAddress,
-                  Wallet.abi,
-                  signer
-              );
-              setState({ contract });
-              fetchBalance(contract);
-              checkName(contract);
+          if (!ethereum) {
+            setCurrentError({localCode : "ERR003", localMessage : "MetaMask n'est pas installé!", notClosable : true});
+            return; // Sortez de la fonction si MetaMask n'est pas installé
           }
-        } catch (error) {
-          console.log(error);
-        }
+          await ethereum.request({method: "eth_requestAccounts"});
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const contract = new ethers.Contract(
+              WalletAddress,
+              Wallet.abi,
+              signer
+          );
+          if(isMounted){
+            setState({ contract });
+            fetchBalance(contract);
+            checkName(contract);
+          }
+      } catch (error) {
+        console.log("Error in connectWaller" ,error);
+      }
     };
     const handleAccountsChanged = async (accounts) => {
         if (accounts.length === 0) {
@@ -58,16 +61,18 @@ function App() {
         window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
     connectWallet();
+    return () => {
+      isMounted = false;
+      if (window.ethereum) {
+          window.ethereum.removeListener('accountsChanged', handleAccountsChanged); // Supprimez l'écouteur
+      }
+    };
   }, [state.contract]);
-
-  function createErrorObject(localcode, localmessage) {
-    return { localcode, localmessage };
-  }
   const handleNameChange = (e) => {
     const value = e.target.value;
     const maxvalue = 16;
     if (value.length >= maxvalue) {
-      setCurrentError(createErrorObject("ERR002", `Le nom ne peut pas dépasser ${maxvalue} caractères !`));
+      setCurrentError({localCode : "ERR002", localMessage :`Le nom ne peut pas dépasser ${maxvalue} caractères !`});
     } else {
       setUserName(value);
     }
@@ -88,6 +93,7 @@ function App() {
       setBalance(formatEther(_balance));
     } catch (err) {
       setCurrentError(err);
+      console.log("error from checkName");
     }
   }
   const setName = async () => {
@@ -98,6 +104,7 @@ function App() {
         setFinalUserName(userName);
     } catch (err) {
       setCurrentError(err);
+      console.log(`error from setName`);
     }
   }
   const withdrawAll = async () => {
@@ -109,6 +116,7 @@ function App() {
       }
       catch (err) {
         setCurrentError(err);
+        console.log("Error from whithdrawAll");
       }
     }
   }
@@ -123,6 +131,7 @@ function App() {
         fetchBalance(state.contract);
       } catch (err) {
         setCurrentError(err);
+        console.log("Error from sendEth");
       }
     }
   }
