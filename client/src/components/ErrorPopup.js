@@ -8,16 +8,23 @@ function ErrorPopup({error}) {
         }
     }, [error]);
     const ErrorHandler = (err) => {
-        console.log(Object.keys(err));
+        if (!err || Object.keys(err).length === 0) {
+            return; // Sortez de la fonction si l'objet d'erreur est vide
+        }
+        console.log("erreur :",err);
         //console.log(err.code, typeof Object.keys(err),Object.keys(err));
         let errorMessage;
         let errorCode;
+        let notClosable = false;
         //Initialiser le code d'erreur et le message d'erreur
         //Erreur local
-        if (err && err.localcode && err.localmessage) {
-            errorCode = err.localcode;
-            errorMessage = err.localmessage;
+        if (err && err.localCode && err.localMessage) {
+            errorCode = err.localCode;
+            errorMessage = err.localMessage;
             console.log("erreur locale");
+            if (err.notClosable){
+                notClosable = true;
+            }
         }
         //Erreur externe
         else if (err && err.info && err.info.error) {
@@ -37,21 +44,29 @@ function ErrorPopup({error}) {
                 
                 console.log("erreur metamask");
             }
-        } else {
+        }else {
             errorCode = "????";
             errorMessage = "Erreur inconnue";
+            console.log(err);
         }
         console.log("code d'erreur : ",errorCode,"message d'erreur: ",errorMessage);
         const newError = {
             id: Date.now(), // Utilisez le timestamp comme ID unique
             message: errorMessage,
+            _notClosable : notClosable,
             animation: 'slideIn'
         };
         setErrors(prevErrors => [newError, ...prevErrors]);
-        const timeoutId = setTimeout(() => {
-            closeErrorPopup(newError.id);
-        }, 10000);
-        newError.timeoutId = timeoutId;
+        if (!newError._notClosable) {
+
+            const timeoutId = setTimeout(() => {
+                closeErrorPopup(newError.id);
+            }, 10000);
+            newError.timeoutId = timeoutId;
+        }
+        else{
+            console.log("L'erreur ne va pas se fermer");
+        }
     }
     const closeErrorPopup = (id) => {
         const errorToClose = errors.find(error => error.id === id);
@@ -79,7 +94,7 @@ function ErrorPopup({error}) {
             {errors.map((error) => (
                 <div key={error.id} className={`error-popup ${error.animation}`}>
                     <span>{error.message}</span>
-                    <button onClick={() => closeErrorPopup(error.id)}>X</button>
+                    {!error._notClosable && <button onClick={() => closeErrorPopup(error.id)}>X</button>}
                 </div>
             ))}
         </div>
