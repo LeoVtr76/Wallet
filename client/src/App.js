@@ -8,14 +8,17 @@ import etherImg from './assets/img/ether.png';
 import flouImg from './assets/img/flou.png';
 import leftLineImg from './assets/img/leftLine.png'
 import rightLineImg from './assets/img/rightLine.png'
+//Components 
+import ErrorPopup from './components/ErrorPopup';
+
 const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 function App() {
   const [state, setState] = useState({contract : null,});
   const [balance, setBalance] = useState();
-  const [errors, setErrors] = useState([]);
   const [showNameInput, setShowNameInput] = useState(false);
   const [userName, setUserName] = useState('');
   const [finalUserName, setFinalUserName] = useState('');
+  const [currentError, setCurrentError] = useState({});
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -55,69 +58,18 @@ function App() {
         window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
     connectWallet();
-}, [state.contract]);
+  }, [state.contract]);
 
-// UseEffect for Error
-useEffect(() => {
-    const errorContainer = document.querySelector('.error-container');
-    if (errorContainer) {
-        console.log("Position du error-container:", errorContainer.getBoundingClientRect());
-    }
-}, [errors]);
-
-const ErrorHandler = (err) => {
-  let errorMessage;
-  if (err.info && err.info.error && err.info.error.code) {
-      var code = err.info.error.code;
-      if (code === 4001) {
-          errorMessage = "La transaction a été annulée";
-      } else if (code === -32603 && err.info.error.data && err.info.error.data.data && err.info.error.data.data.reason) {
-          errorMessage = err.info.error.data.data.reason;
-      } else {
-          errorMessage = "Une erreur inconnue est survenue";
-      }
-      const newError = {
-        id: Date.now(), // Utilisez le timestamp comme ID unique
-        message: errorMessage,
-        animation: 'slideIn'
-      };
-      setErrors(prevErrors => [newError, ...prevErrors]);
-      const timeoutId = setTimeout(() => {
-        closeErrorPopup(newError.id);
-      }, 10000);
-      newError.timeoutId = timeoutId;
+  function createErrorObject(localcode, localmessage) {
+    return { localcode, localmessage };
   }
-}
-
-const closeErrorPopup = (id) => {
-  const errorToClose = errors.find(error => error.id === id);
-
-    // Si l'erreur a un timeout associé, annulez-le
-  if (errorToClose && errorToClose.timeoutId) {
-      clearTimeout(errorToClose.timeoutId);
-  }
-  setErrors(prevErrors => {
-      return prevErrors.map(error => {
-          if (error.id === id) {
-              return { ...error, animation: 'slideOut' };
-          }
-          return error;
-      });
-  });
-
-  // Supprimez l'erreur après l'animation
-  setTimeout(() => {
-      setErrors(prevErrors => prevErrors.filter(error => error.id !== id));
-  }, 300);
-}
   const handleNameChange = (e) => {
     const value = e.target.value;
-    const maxvalue = 15;
-    if (value.length > maxvalue) {
-        setErrors(`Le nom ne peut pas dépasser ${maxvalue} caractères !`);
+    const maxvalue = 16;
+    if (value.length >= maxvalue) {
+      setCurrentError(createErrorObject("ERR002", `Le nom ne peut pas dépasser ${maxvalue} caractères !`));
     } else {
-        setUserName(value);
-        closeErrorPopup();
+      setUserName(value);
     }
   }
   const checkName = async (contract) => {
@@ -135,7 +87,7 @@ const closeErrorPopup = (id) => {
       const _balance = await contract.getBalance();
       setBalance(formatEther(_balance));
     } catch (err) {
-      ErrorHandler(err);
+      setCurrentError(err);
     }
   }
   const setName = async () => {
@@ -145,7 +97,7 @@ const closeErrorPopup = (id) => {
         setShowNameInput(false); // Cachez le champ d'entrée une fois que le nom est défini
         setFinalUserName(userName);
     } catch (err) {
-      ErrorHandler(err);
+      setCurrentError(err);
     }
   }
   const withdrawAll = async () => {
@@ -156,7 +108,7 @@ const closeErrorPopup = (id) => {
         fetchBalance(state.contract);
       }
       catch (err) {
-        ErrorHandler(err);
+        setCurrentError(err);
       }
     }
   }
@@ -170,7 +122,7 @@ const closeErrorPopup = (id) => {
         await transaction.wait();
         fetchBalance(state.contract);
       } catch (err) {
-        ErrorHandler(err);
+        setCurrentError(err);
       }
     }
   }
@@ -198,14 +150,7 @@ const closeErrorPopup = (id) => {
       </div>
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
-      <div className="error-container">
-        {errors.map((error) => (
-          <div key={error.id} className={`error-popup ${error.animation}`}>
-            <span>{error.message}</span>
-            <button onClick={() => closeErrorPopup(error.id)}>X</button>
-          </div>
-          ))}
-      </div>
+      <ErrorPopup error={currentError} />
     </div>
   );
 }
