@@ -8,7 +8,7 @@
 }
 @font-face {
   font-family: 'AblationBlack';
-  src: url('./font/AblationBlack.otf') format('opentype');
+  src: url('./assets/font/AblationBlack.otf') format('opentype');
 }
 * {
   margin: 0;
@@ -26,7 +26,7 @@ html, body {
   align-items: flex-start;
   height: 100vh;
   padding-top: 30vh;
-  background-image: url('./img/background.png');
+  background-image: url('./assets/img/background.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

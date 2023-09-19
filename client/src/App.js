@@ -3,11 +3,11 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { parseUnits, formatEther } from "ethers";
 import Wallet from "./artifacts/contracts/Wallet.sol/Wallet.json";
-import circleImg from './img/circle.png';
-import etherImg from './img/ether.png';
-import flouImg from './img/flou.png';
-import leftLineImg from './img/leftLine.png'
-import rightLineImg from './img/rightLine.png'
+import circleImg from './assets/img/circle.png';
+import etherImg from './assets/img/ether.png';
+import flouImg from './assets/img/flou.png';
+import leftLineImg from './assets/img/leftLine.png'
+import rightLineImg from './assets/img/rightLine.png'
 const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 function App() {
   const [state, setState] = useState({contract : null,});
