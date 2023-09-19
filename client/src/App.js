@@ -16,7 +16,6 @@ function App() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [userName, setUserName] = useState('');
   const [finalUserName, setFinalUserName] = useState('');
-  const [popupAnimation, setPopupAnimation] = useState('');
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -65,6 +64,7 @@ useEffect(() => {
         console.log("Position du error-container:", errorContainer.getBoundingClientRect());
     }
 }, [errors]);
+
 const ErrorHandler = (err) => {
   let errorMessage;
   if (err.info && err.info.error && err.info.error.code) {
@@ -82,10 +82,20 @@ const ErrorHandler = (err) => {
         animation: 'slideIn'
       };
       setErrors(prevErrors => [newError, ...prevErrors]);
-      setPopupAnimation('slideIn');
+      const timeoutId = setTimeout(() => {
+        closeErrorPopup(newError.id);
+      }, 10000);
+      newError.timeoutId = timeoutId;
   }
 }
+
 const closeErrorPopup = (id) => {
+  const errorToClose = errors.find(error => error.id === id);
+
+    // Si l'erreur a un timeout associé, annulez-le
+  if (errorToClose && errorToClose.timeoutId) {
+      clearTimeout(errorToClose.timeoutId);
+  }
   setErrors(prevErrors => {
       return prevErrors.map(error => {
           if (error.id === id) {
