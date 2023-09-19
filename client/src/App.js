@@ -76,17 +76,29 @@ const ErrorHandler = (err) => {
       } else {
           errorMessage = "Une erreur inconnue est survenue";
       }
-      setErrors(prevErrors => [errorMessage, ...prevErrors]);
+      const newError = {
+        id: Date.now(), // Utilisez le timestamp comme ID unique
+        message: errorMessage,
+        animation: 'slideIn'
+      };
+      setErrors(prevErrors => [newError, ...prevErrors]);
       setPopupAnimation('slideIn');
   }
 }
-const closeErrorPopup = (index) => {
-  setPopupAnimation('slideOut');
-  setTimeout(() => {
-      setErrors(prevErrors => {
-          return prevErrors.filter((_, i) => i !== index);
+const closeErrorPopup = (id) => {
+  setErrors(prevErrors => {
+      return prevErrors.map(error => {
+          if (error.id === id) {
+              return { ...error, animation: 'slideOut' };
+          }
+          return error;
       });
-  }, 300); // Attendre que l'animation soit terminée pour supprimer l'erreur
+  });
+
+  // Supprimez l'erreur après l'animation
+  setTimeout(() => {
+      setErrors(prevErrors => prevErrors.filter(error => error.id !== id));
+  }, 300);
 }
   const handleNameChange = (e) => {
     const value = e.target.value;
@@ -177,10 +189,10 @@ const closeErrorPopup = (index) => {
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
       <button onClick={withdrawAll}className="btn-receive noselect">RECUPERER DE L'ETHER</button>
       <div className="error-container">
-        {errors.map((error, index) => (
-          <div key={index} className={`error-popup ${popupAnimation}`}>
-            <span>{error}</span>
-            <button onClick={() => closeErrorPopup(index)}>X</button>
+        {errors.map((error) => (
+          <div key={error.id} className={`error-popup ${error.animation}`}>
+            <span>{error.message}</span>
+            <button onClick={() => closeErrorPopup(error.id)}>X</button>
           </div>
           ))}
       </div>
