@@ -1,25 +1,7 @@
-import { useState, useEffect } from "react";
-import { formatEther } from "ethers";
 import { useAccount } from "../context/Account";
 
-function BalanceDisplay({ contract, onError }) {
-  // const [balance, setBalance] = useState();
+function BalanceDisplay() {
   const { balance } = useAccount();
-
-  // useEffect(() => {
-  //   const fetchBalance = async () => {
-  //     console.log("fetchBalance");
-  //     try {
-  //       const _balance = await contract.getBalance();
-  //       setBalance(formatEther(_balance));
-  //     } catch (err) {
-  //       console.log("error from fetchBalance");
-  //       onError(err);
-  //     }
-  //   };
-
-  //   fetchBalance();
-  // }, [contract, onError]);
 
   return (
     <div className="ethAmount">
