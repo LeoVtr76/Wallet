@@ -11,17 +11,19 @@ import rightLineImg from './assets/img/rightLine.png'
 //Components 
 import ErrorPopup from './components/ErrorPopup';
 import SetName from './components/SetName';
+import BalanceDisplay from './components/BalanceDisplay';
 
 const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
 function App() {
   const [state, setState] = useState({contract : null,});
-  const [balance, setBalance] = useState();
   const [finalUserName, setFinalUserName] = useState('');
   const [currentError, setCurrentError] = useState({});
   const [isMounted, setIsMounted] = useState(true);
   const [useName , setUseName] = useState();
+  const [useBalance, setUseBalance] = useState(true);
   const [currentAccount, setCurrentAccount] = useState();
+
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -42,7 +44,8 @@ function App() {
         if(isMounted){
           console.log("isMounted");
           setState({ contract });
-          fetchBalance(contract);
+          setUseBalance(true);
+          //fetchBalance(contract);
           setUseName(true);
         }
       }
@@ -73,22 +76,13 @@ function App() {
     };
   }, [state.contract, currentAccount]);
 
-  const fetchBalance = async (contract) => {
-    try {
-      const _balance = await contract.getBalance();
-      setBalance(formatEther(_balance));
-    } catch (err) {
-      setCurrentError(err);
-      console.log("error from checkName");
-    }
-  }
-
   const withdrawAll = async () => {
     if (state.contract) {
       try{
         const transaction = await state.contract.withdrawAll();
         await transaction.wait();
-        fetchBalance(state.contract);
+        setUseBalance(true);
+        //fetchBalance(state.contract);
       }
       catch (err) {
         setCurrentError(err);
@@ -104,7 +98,9 @@ function App() {
       };
         const transaction = await state.contract.sendEth(overrides);
         await transaction.wait();
-        fetchBalance(state.contract);
+        setUseBalance(true);
+        
+        //fetchBalance(state.contract);
       } catch (err) {
         setCurrentError(err);
         console.log("Error from sendEth");
@@ -123,7 +119,7 @@ function App() {
           <img className="circle noselect" draggable="false" src={circleImg} alt="circle" />
           <img className="ether noselect" draggable="false" src={etherImg} alt="ether" />
         </div>
-        <div className="ethAmount">{balance === "0.0" ? "0" : balance || 0} ETH</div>
+        <BalanceDisplay contract={state.contract} onError={setCurrentError} useBalance={useBalance} setUseBalance={setUseBalance} />
         <SetName contract={state.contract} onError={setCurrentError} onFinalUsername={setFinalUserName} useName = {useName} setUseName = {setUseName} />
       </div>
       <button onClick={sendEth} className="btn-send noselect">DEPOSER DE L'ETHER</button>
