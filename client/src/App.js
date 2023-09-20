@@ -21,7 +21,7 @@ function App() {
   const [currentError, setCurrentError] = useState({});
   const [isMounted, setIsMounted] = useState(true);
   const [useName, setUseName] = useState();
-  const [useBalance, setUseBalance] = useState(true);
+  const [useBalance, setUseBalance] = useState(false);
   const [currentAccount, setCurrentAccount] = useState();
 
   useEffect(() => {
@@ -148,6 +148,12 @@ function App() {
         {useBalance && (
           <BalanceDisplay contract={state.contract} onError={setCurrentError} />
         )}
+        <button
+          onClick={() => setUseBalance(!useBalance)}
+          className="balance-toggle-button"
+        >
+          {useBalance ? "Hide" : "Show"} balance
+        </button>
         <SetName
           contract={state.contract}
           onError={setCurrentError}

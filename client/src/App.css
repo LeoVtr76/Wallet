@@ -202,3 +202,6 @@ html, body {
   background-color: #FF1980;
 }
 
+.balance-toggle-button {
+  z-index: 10;
+}
