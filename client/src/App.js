@@ -12,6 +12,7 @@ import rightLineImg from "./assets/img/rightLine.png";
 import ErrorPopup from "./components/ErrorPopup";
 import SetName from "./components/SetName";
 import BalanceDisplay from "./components/BalanceDisplay";
+import { useAccount } from "./context/Account";
 
 const WalletAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
@@ -23,6 +24,8 @@ function App() {
   const [useName, setUseName] = useState();
   const [useBalance, setUseBalance] = useState(false);
   const [currentAccount, setCurrentAccount] = useState();
+
+  const { isConnected, setIsConnected, balance } = useAccount();
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -145,14 +148,14 @@ function App() {
             alt="ether"
           />
         </div>
-        {useBalance && (
+        {isConnected && (
           <BalanceDisplay contract={state.contract} onError={setCurrentError} />
         )}
         <button
-          onClick={() => setUseBalance(!useBalance)}
+          onClick={() => setIsConnected(!isConnected)}
           className="balance-toggle-button"
         >
-          {useBalance ? "Hide" : "Show"} balance
+          {isConnected ? "Disconnect" : "Connect"}
         </button>
         <SetName
           contract={state.contract}
