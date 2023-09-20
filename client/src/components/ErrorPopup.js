@@ -4,10 +4,14 @@ function ErrorPopup({error}) {
     const [errors, setErrors] = useState([]);
     useEffect(() => {
         if (error) {
+            console.log("error");
             ErrorHandler(error);
         }
     }, [error]);
     const ErrorHandler = (err) => {
+        console.log(err);
+        console.log("ErrorHandler");
+        console.log(Object.keys(err));
         if (!err || Object.keys(err).length === 0) {
             return; // Sortez de la fonction si l'objet d'erreur est vide
         }
