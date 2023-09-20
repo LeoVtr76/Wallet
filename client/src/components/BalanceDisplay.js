@@ -1,17 +1,30 @@
-import circleImg from './assets/img/circle.png';
-import etherImg from './assets/img/ether.png';
-import flouImg from './assets/img/flou.png';
+import {useState, useEffect} from "react";
+import {formatEther } from "ethers";
+function BalanceDisplay({ contract, useBalance, setUseBalance, onError }) {
+    const [balance, setBalance] = useState();
 
-function BalanceDisplay({ balance }) {
+    useEffect(() => {
+        if(useBalance){
+            console.log("fetchbalance");
+            fetchBalance();
+        }
+        else{
+            console.log("useBalance is false");
+        }
+    },[contract,useBalance]);
+    
+    const fetchBalance = async (contract) => {
+        try {
+          const _balance = await contract.getBalance();
+          setBalance(formatEther(_balance));
+          setUseBalance = false;
+        } catch (err) {
+          onError(err);
+          console.log("error from fetchBalance");
+        }
+      }
     return (
-        <div className="logoContainer">
-            <div className="logo">
-                <img className="flou noselect" draggable="false" src={flouImg} alt="flou" />
-                <img className="circle noselect" draggable="false" src={circleImg} alt="circle" />
-                <img className="ether noselect" draggable="false" src={etherImg} alt="ether" />
-            </div>
-            <div className="ethAmount">{balance === "0.0" ? "0" : balance || 0} ETH</div>
-        </div>
+        <div className="ethAmount">{balance === "0.0" ? "0" : balance || 0} ETH</div>  
     );
 }
 
